@@ -1,0 +1,55 @@
+# ============================================================================
+# MODEL REGISTRY
+# ============================================================================
+
+router_model: "qwen2.5:3b-instruct-q4_K_M"
+
+models:
+  - name: "qwen2.5:3b-instruct-q4_K_M"
+    role: chat
+    capabilities: [general, summarization, reasoning, document_qa, planning, classification, routing, quick_tasks, coding, debugging, code_review]
+    vram_gb: 2.2
+    display_name: "Qwen2.5 3B (Fast & Stable)"
+
+  - name: "llama3.1:8b-instruct-q4_K_M"
+    role: chat
+    capabilities: [general, summarization, reasoning, document_qa, planning, coding]
+    vram_gb: 5.5
+    display_name: "Llama 3.1 8B"
+
+  - name: "qwen2.5-coder:7b-instruct-q4_K_M"
+    role: chat
+    capabilities: [coding, debugging, code_review]
+    vram_gb: 5.2
+    display_name: "Qwen2.5-Coder 7B"
+
+  - name: "llama3.2:3b"
+    role: chat
+    capabilities: [general, summarization, reasoning, document_qa, quick_tasks]
+    vram_gb: 2.0
+    display_name: "Llama 3.2 3B"
+
+  - name: "moondream:latest"
+    role: vision
+    capabilities: [ocr, handwriting, engineering_drawing, image_qa]
+    vram_gb: 2.0
+    display_name: "Moondream (vision)"
+
+  - name: "qwen2.5vl:3b"
+    role: vision
+    capabilities: [ocr, handwriting, engineering_drawing, image_qa]
+    vram_gb: 3.2
+    display_name: "Qwen2.5-VL 3B (vision)"
+
+  - name: "nomic-embed-text:latest"
+    role: embedding
+    capabilities: [embedding]
+    vram_gb: 0.3
+    display_name: "Nomic Embed Text"
+
+task_routing:
+  code: [coding, debugging, code_review]
+  spreadsheet: [general, reasoning]
+  document: [document_qa, summarization]
+  image: [ocr, handwriting, engineering_drawing]
+  general: [general, reasoning, planning]

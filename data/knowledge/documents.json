@@ -1,0 +1,81 @@
+{
+  "SOP-104": {
+    "document_id": "SOP-104",
+    "filename": "SOP-104_Rev6.txt",
+    "filepath": "data\\uploads\\SOP-104_Rev6.txt",
+    "chunks_count": 1,
+    "metadata": {
+      "document_id": "SOP-104",
+      "document_name": "SOP-104 Pump Isolation Procedure",
+      "source_type": "SOP",
+      "revision": "Rev 6",
+      "is_current_revision": true,
+      "department": "Operations",
+      "author": "Internal",
+      "date": "",
+      "access_scope": [
+        "operations",
+        "engineering"
+      ],
+      "tags": [],
+      "equipment_tags": [
+        "P-101",
+        "V-101"
+      ],
+      "filepath": "data\\uploads\\SOP-104_Rev6.txt",
+      "created_at": 1789201120
+    }
+  },
+  "SOP-104_Old": {
+    "document_id": "SOP-104_Old",
+    "filename": "SOP-104_Rev5.txt",
+    "filepath": "data\\uploads\\SOP-104_Rev5.txt",
+    "chunks_count": 1,
+    "metadata": {
+      "document_id": "SOP-104_Old",
+      "document_name": "SOP-104 Pump Isolation Procedure",
+      "source_type": "SOP",
+      "revision": "Rev 5",
+      "is_current_revision": false,
+      "department": "Operations",
+      "author": "Internal",
+      "date": "",
+      "access_scope": [
+        "operations"
+      ],
+      "tags": [],
+      "equipment_tags": [
+        "P-101",
+        "V-101"
+      ],
+      "filepath": "data\\uploads\\SOP-104_Rev5.txt",
+      "created_at": 1789201127
+    }
+  },
+  "corr_v101_001": {
+    "document_id": "corr_v101_001",
+    "filename": "correspondence_v101.json",
+    "filepath": "data\\uploads\\correspondence_v101.json",
+    "chunks_count": 1,
+    "metadata": {
+      "document_name": "Correspondence: Site Exception for V-101 Pre-Start Check",
+      "source_type": "Correspondence",
+      "author": "j.smith@company.org",
+      "recipient": "operations-team@company.org",
+      "date": "2026-05-10",
+      "thread_id": "corr_v101_001",
+      "subject": "Site Exception for V-101 Pre-Start Check",
+      "revision": "1.0",
+      "is_current_revision": true,
+      "department": "Communications",
+      "access_scope": [
+        "all"
+      ],
+      "tags": [],
+      "equipment_tags": [
+        "V-101",
+        "P-101"
+      ]
+    }
+  }
+}

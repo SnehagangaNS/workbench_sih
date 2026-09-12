@@ -1,0 +1,134 @@
+{
+  "directed": true,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "type": "pump",
+      "tag": "P-101",
+      "bbox": [
+        450,
+        720,
+        610,
+        880
+      ],
+      "page": 1,
+      "confidence": 0.95,
+      "category": "equipment",
+      "id": "P-101"
+    },
+    {
+      "type": "gate_valve",
+      "tag": "V-101",
+      "bbox": [
+        950,
+        760,
+        1050,
+        840
+      ],
+      "page": 1,
+      "confidence": 0.92,
+      "category": "valve_instrument",
+      "id": "V-101"
+    },
+    {
+      "type": "pressure_transmitter",
+      "tag": "PT-101",
+      "bbox": [
+        1160,
+        340,
+        1240,
+        420
+      ],
+      "page": 1,
+      "confidence": 0.94,
+      "category": "valve_instrument",
+      "id": "PT-101"
+    },
+    {
+      "type": "tank",
+      "tag": "TK-102",
+      "bbox": [
+        1500,
+        650,
+        1850,
+        950
+      ],
+      "page": 1,
+      "confidence": 0.98,
+      "category": "equipment",
+      "id": "TK-102"
+    },
+    {
+      "text": "P-101",
+      "bbox": [
+        500,
+        680,
+        560,
+        710
+      ],
+      "page": 1,
+      "category": "text",
+      "id": "t1"
+    },
+    {
+      "text": "V-101",
+      "bbox": [
+        980,
+        720,
+        1030,
+        750
+      ],
+      "page": 1,
+      "category": "text",
+      "id": "t2"
+    },
+    {
+      "text": "PT-101",
+      "bbox": [
+        1170,
+        300,
+        1230,
+        330
+      ],
+      "page": 1,
+      "category": "text",
+      "id": "t3"
+    },
+    {
+      "text": "TK-102",
+      "bbox": [
+        1620,
+        600,
+        1680,
+        630
+      ],
+      "page": 1,
+      "category": "text",
+      "id": "t4"
+    }
+  ],
+  "links": [
+    {
+      "relationship": "upstream_of",
+      "confidence": 0.91,
+      "line_id": null,
+      "source": "P-101",
+      "target": "V-101"
+    },
+    {
+      "relationship": "upstream_of",
+      "confidence": 0.88,
+      "line_id": null,
+      "source": "V-101",
+      "target": "TK-102"
+    },
+    {
+      "relationship": "monitored_by",
+      "confidence": 0.93,
+      "line_id": null,
+      "source": "TK-102",
+      "target": "PT-101"
+    }
+  ]
+}

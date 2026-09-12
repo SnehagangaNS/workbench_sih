@@ -1,0 +1,152 @@
+{
+  "document_id": "pid_test_001",
+  "filename": "synthetic_pid_test.png",
+  "created_at": 1700000000,
+  "pages": [
+    {
+      "page": 1,
+      "width": 2400,
+      "height": 1600,
+      "dpi": 300,
+      "symbols": [
+        {
+          "id": "sym_1",
+          "type": "pump",
+          "bbox": [
+            450,
+            720,
+            610,
+            880
+          ],
+          "confidence": 0.95,
+          "page": 1,
+          "tag": "P-101",
+          "attributes": {}
+        },
+        {
+          "id": "sym_2",
+          "type": "gate_valve",
+          "bbox": [
+            950,
+            760,
+            1050,
+            840
+          ],
+          "confidence": 0.92,
+          "page": 1,
+          "tag": "V-101",
+          "attributes": {}
+        },
+        {
+          "id": "sym_3",
+          "type": "pressure_transmitter",
+          "bbox": [
+            1160,
+            340,
+            1240,
+            420
+          ],
+          "confidence": 0.94,
+          "page": 1,
+          "tag": "PT-101",
+          "attributes": {}
+        },
+        {
+          "id": "sym_4",
+          "type": "tank",
+          "bbox": [
+            1500,
+            650,
+            1850,
+            950
+          ],
+          "confidence": 0.98,
+          "page": 1,
+          "tag": "TK-102",
+          "attributes": {}
+        }
+      ],
+      "texts": [
+        {
+          "id": "t1",
+          "text": "P-101",
+          "bbox": [
+            500,
+            680,
+            560,
+            710
+          ],
+          "confidence": 0.96,
+          "page": 1,
+          "category": "equipment_tag"
+        },
+        {
+          "id": "t2",
+          "text": "V-101",
+          "bbox": [
+            980,
+            720,
+            1030,
+            750
+          ],
+          "confidence": 0.95,
+          "page": 1,
+          "category": "equipment_tag"
+        },
+        {
+          "id": "t3",
+          "text": "PT-101",
+          "bbox": [
+            1170,
+            300,
+            1230,
+            330
+          ],
+          "confidence": 0.94,
+          "page": 1,
+          "category": "instrument_tag"
+        },
+        {
+          "id": "t4",
+          "text": "TK-102",
+          "bbox": [
+            1620,
+            600,
+            1680,
+            630
+          ],
+          "confidence": 0.99,
+          "page": 1,
+          "category": "equipment_tag"
+        }
+      ],
+      "lines": [],
+      "connections": [
+        {
+          "from_id": "P-101",
+          "to_id": "V-101",
+          "relationship": "upstream_of",
+          "confidence": 0.91,
+          "line_id": null,
+          "metadata": {}
+        },
+        {
+          "from_id": "V-101",
+          "to_id": "TK-102",
+          "relationship": "upstream_of",
+          "confidence": 0.88,
+          "line_id": null,
+          "metadata": {}
+        },
+        {
+          "from_id": "TK-102",
+          "to_id": "PT-101",
+          "relationship": "monitored_by",
+          "confidence": 0.93,
+          "line_id": null,
+          "metadata": {}
+        }
+      ]
+    }
+  ]
+}

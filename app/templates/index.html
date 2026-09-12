@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic AI Workbench</title>
+<link rel="stylesheet" href="/static/style.css?v=5">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <button type="button" id="toggle-left-sidebar" class="nav-toggle-btn" title="Toggle Sidebar (Left Panel)">
+      <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+      <span>Sidebar</span>
+    </button>
+    <div class="brand-container">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="brand-titles">
+        <span class="brand-name">Agentic AI Workbench</span>
+        <span class="brand-sub">AIR-GAPPED ENTERPRISE RUNTIME</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="topbar-right">
+    <button type="button" id="open-privacy-dashboard-btn" class="nav-toggle-btn btn-privacy-shield" title="Open Provable Local-Only Privacy & Security Dashboard">
+      <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+      <span>LOCAL-ONLY MODE</span>
+    </button>
+    <button type="button" id="open-pid-viewer-btn" class="nav-toggle-btn btn-pid-viewer" title="Open Interactive Visual P&ID Viewer">
+      <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="10" cy="13" r="2"/><path d="m20 17-1.5-1.5"/></svg>
+      <span>P&ID Viewer</span>
+    </button>
+    <span class="status-pill" id="ollama-status">
+      <span class="dot" id="ollama-dot"></span>
+      <span id="ollama-status-text">Checking system...</span>
+    </span>
+    <span class="status-pill" id="rag-status">
+      <svg class="pill-svg" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span id="rag-status-text">0 Chunks Indexed</span>
+    </span>
+    <button type="button" id="toggle-right-sidebar" class="nav-toggle-btn" title="Upload Files & Open Document Studio (Right Panel)">
+      <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <span>Upload & Document Studio</span>
+    </button>
+  </div>
+</header>
+
+<main class="layout" id="app-layout">
+
+  <!-- LEFT: Chat History & Model Roster (Collapsible) -->
+  <aside class="panel panel-models" id="left-sidebar">
+    <div class="panel-action-header">
+      <button type="button" id="new-chat-btn" class="btn-new-chat" title="Start New Chat Workspace">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>New Chat</span>
+      </button>
+    </div>
+
+    <!-- Recent Chats Section -->
+    <div class="panel-section">
+      <div class="panel-header">
+        <div class="panel-title">Recent Chats</div>
+        <div class="panel-sub">Saved Conversations</div>
+      </div>
+      <div id="session-list" class="session-list">
+        <div class="trace-empty">No saved chats yet.</div>
+      </div>
+    </div>
+
+    <!-- Model Roster Section -->
+    <div class="panel-section">
+      <div class="panel-header">
+        <div class="panel-title">Model Roster</div>
+        <div class="panel-sub">Registry & Discovery</div>
+      </div>
+      <div id="model-list" class="model-list">
+        <div class="model-row skeleton">Scanning active models...</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTER: Main Task & Direct Answer Workspace -->
+  <section class="panel panel-main" id="main-workspace">
+    
+    <!-- Task Form -->
+    <form id="task-form" class="task-form">
+      <div class="control-bar">
+        <div class="model-select-group">
+          <label for="model-select" class="field-label">Target Model:</label>
+          <select id="model-select" class="model-select-dropdown">
+            <option value="auto">Auto-detect (Smart Task Router)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Quick Prompt Action Chips -->
+      <div class="prompt-chips">
+        <span class="chip-label">Prompts:</span>
+        <button type="button" class="chip" data-prompt="What equipment and valves are downstream of P-101 in the P&ID drawing?">P&ID: Downstream Query</button>
+        <button type="button" class="chip" data-prompt="Trace the connected piping path from TK-101 to P-102 in the P&ID diagram.">P&ID: Trace Pipeline Path</button>
+        <button type="button" class="chip" data-prompt="Read and summarize the key facts, specs, and action items from the document in uploads.">Summarize Document</button>
+        <button type="button" class="chip" data-prompt="Analyze the uploaded spreadsheet. Calculate totals, averages, and group summaries using Python pandas.">Analyze Data</button>
+      </div>
+
+      <div class="input-wrapper">
+        <textarea id="task-input" placeholder="Enter task instructions or P&ID engineering questions (e.g. 'What is downstream of P-101?')..." rows="3"></textarea>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" id="run-btn" class="btn-primary">
+          <svg class="btn-svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span>Run Task</span>
+        </button>
+        <button type="button" id="clear-btn" class="btn-secondary">Clear Workspace</button>
+      </div>
+    </form>
+
+    <!-- Main Direct Output Display Workspace -->
+    <div class="output-workspace-card">
+      <div class="output-header">
+        <div class="output-header-title">
+          <span>Direct Output & Analysis</span>
+        </div>
+        <div id="export-container" class="export-container" style="display: none;">
+          <button id="export-docx-btn" class="btn-export">
+            <svg class="btn-svg" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Export Word (.docx)</span>
+          </button>
+          <button id="export-md-btn" class="btn-export-sub">
+            <svg class="btn-svg" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Export Markdown (.md)</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Direct Output Content Box -->
+      <div id="direct-output-box" class="direct-output-box">
+        <div class="output-placeholder">
+          Submit a task or select a prompt above. The direct answer will stream below cleanly in real-time.
+        </div>
+      </div>
+    </div>
+
+    <!-- Collapsible Technical Execution Steps Drawer (Hidden by default) -->
+    <details id="execution-steps-drawer" class="execution-drawer">
+      <summary class="drawer-summary">
+        <div class="drawer-title-group">
+          <svg class="drawer-icon" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span class="drawer-title">Technical Execution Logs</span>
+        </div>
+        <span class="drawer-badge" id="step-count-badge">0 Steps</span>
+      </summary>
+      <div id="trace-logs" class="trace-logs">
+        <div class="trace-empty">Technical execution step logs will record here.</div>
+      </div>
+    </details>
+
+  </section>
+
+  <!-- RIGHT: Ingestion & Deliverables Studio (Collapsible) -->
+  <aside class="panel panel-side" id="right-sidebar">
+    <div class="panel-header">
+      <div class="panel-title">Document Studio</div>
+      <div class="panel-sub">P&ID PDF / DOCX / PPTX / XLSX / Images</div>
+    </div>
+    
+    <form id="upload-form" class="upload-form">
+      <div id="drop-zone" class="drop-zone">
+        <svg class="drop-svg" viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <div class="drop-text">Drag & drop files here</div>
+        <div class="drop-sub">or <span class="browse-link">browse system files</span></div>
+        <input type="file" id="file-input" class="file-input-hidden" />
+      </div>
+
+      <div class="ingest-controls">
+        <select id="mode-select" class="mode-select">
+          <option value="">Auto-detect Extraction Mode</option>
+          <option value="pid">P&ID Diagram Intelligence Pipeline</option>
+          <option value="handwriting">Handwriting Transcription</option>
+          <option value="engineering_drawing">Engineering Drawing / Schematic</option>
+        </select>
+        <button type="submit" class="btn-ingest">Ingest File</button>
+      </div>
+    </form>
+    
+    <div id="ingest-log" class="ingest-log"></div>
+
+    <div class="panel-header outputs-header">
+      <div class="panel-title">Session Deliverables</div>
+    </div>
+    <div id="output-list" class="output-list">
+      <div class="trace-empty">Current session deliverables will appear here.</div>
+    </div>
+  </aside>
+
+</main>
+
+<!-- Interactive Visual P&ID Viewer Modal Overlay -->
+<div id="pid-modal" class="pid-modal-backdrop" style="display: none;">
+  <div class="pid-modal-content">
+    <div class="pid-modal-header">
+      <div class="pid-modal-title-group">
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+        <span class="pid-modal-title">Interactive Visual P&ID Viewer</span>
+      </div>
+      
+      <div class="pid-modal-controls">
+        <select id="pid-doc-select" class="pid-select-dropdown">
+          <option value="">Select P&ID Drawing...</option>
+        </select>
+
+        <div class="zoom-controls">
+          <button type="button" id="pid-zoom-in-btn" class="btn-zoom" title="Zoom In">+</button>
+          <button type="button" id="pid-zoom-out-btn" class="btn-zoom" title="Zoom Out">-</button>
+          <button type="button" id="pid-zoom-reset-btn" class="btn-zoom" title="Reset Zoom">100%</button>
+        </div>
+
+        <div class="overlay-toggles">
+          <label class="toggle-label"><input type="checkbox" id="toggle-symbols-cb" checked> Symbols</label>
+          <label class="toggle-label"><input type="checkbox" id="toggle-texts-cb" checked> OCR Tags</label>
+        </div>
+
+        <button type="button" id="close-pid-modal-btn" class="btn-close-modal" title="Close Viewer">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="pid-modal-body">
+      <div id="pid-canvas-container" class="pid-canvas-container">
+        <div class="pid-viewer-placeholder">
+          Select a processed P&ID document above to launch interactive bounding boxes and path highlights.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Privacy & Security Dashboard Modal -->
+<div id="privacy-dashboard-modal" class="pid-modal-backdrop hidden">
+  <div class="pid-modal-content privacy-modal-content">
+    <div class="pid-modal-header">
+      <div class="pid-modal-title-group">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+        <span class="pid-modal-title">Provable Local-Only Privacy & Security Dashboard</span>
+      </div>
+      <button type="button" id="close-privacy-modal-btn" class="btn-close-modal">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="privacy-modal-body">
+      <!-- Status Cards Grid -->
+      <div class="privacy-grid">
+        <div class="privacy-card">
+          <div class="card-label">Security Mode</div>
+          <div class="card-value mode-badge">LOCAL-ONLY MODE</div>
+        </div>
+        <div class="privacy-card">
+          <div class="card-label">External Network Calls</div>
+          <div class="card-value zero-badge">0</div>
+        </div>
+        <div class="privacy-card">
+          <div class="card-label">Blocked External Attempts</div>
+          <div class="card-value zero-badge" id="privacy-blocked-count">0</div>
+        </div>
+        <div class="privacy-card">
+          <div class="card-label">Network Monitor Status</div>
+          <div class="card-value active-badge">ACTIVE (Patched)</div>
+        </div>
+      </div>
+
+      <!-- Startup Verification Status -->
+      <div class="privacy-section">
+        <div class="privacy-section-title">Local-Only Security Startup Audit</div>
+        <div id="privacy-startup-checks" class="startup-checks-list">
+          <div class="check-item"><span class="check-icon">✓</span> LLM Driver: localhost:11434 (Ollama)</div>
+          <div class="check-item"><span class="check-icon">✓</span> OCR Extractor: On-Device (Tesseract)</div>
+          <div class="check-item"><span class="check-icon">✓</span> Embeddings: nomic-embed-text (Local)</div>
+          <div class="check-item"><span class="check-icon">✓</span> Vector Database: ChromaDB Persistent</div>
+        </div>
+      </div>
+
+      <!-- Component Registry Table -->
+      <div class="privacy-section">
+        <div class="privacy-section-title">Local Service Component Registry</div>
+        <table class="privacy-table">
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Type</th>
+              <th>Location</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="privacy-component-rows">
+            <tr><td>Local LLM</td><td>Inference Engine</td><td>localhost:11434</td><td><span class="pill-green">LOCAL-ONLY</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Observable Network Monitor Live Stream -->
+      <div class="privacy-section">
+        <div class="privacy-section-title">Observable Network Activity Monitor Log</div>
+        <div class="privacy-log-container" id="privacy-network-logs">
+          <div class="log-entry">12:41:02 | Local LLM (Ollama) -> 127.0.0.1:11434 | TCP/IP OUTBOUND | ALLOWED</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/app.js?v=6"></script>
+</body>
+</html>
