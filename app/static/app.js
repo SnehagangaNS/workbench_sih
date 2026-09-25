@@ -53,6 +53,26 @@ let currentPidData = null;
 // Track files generated during the CURRENT session only
 const currentSessionOutputs = new Set();
 
+// ---------------- Theme Toggle Control ----------------
+
+function initTheme() {
+  const savedTheme = localStorage.getItem("theme") || "dark";
+  if (savedTheme === "dark") {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
+}
+initTheme();
+
+const themeToggleBtn = document.getElementById("theme-toggle-btn");
+if (themeToggleBtn) {
+  themeToggleBtn.addEventListener("click", () => {
+    const isDark = document.documentElement.classList.toggle("dark");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  });
+}
+
 // ---------------- Dual Sidebar Toggle Controls ----------------
 
 if (toggleLeftBtn) {
@@ -303,7 +323,7 @@ function addTraceLogEntry(labelClass, labelText, bodyText) {
   entry.innerHTML = `
     <div>
       <span class="trace-label ${labelClass}">${labelText}</span>
-      <span style="color: var(--text-secondary); margin-left: 8px;">${escapeHtml(bodyText)}</span>
+      <span style="margin-left: 8px;">${escapeHtml(bodyText)}</span>
     </div>
   `;
   traceLogsEl.appendChild(entry);
@@ -740,7 +760,7 @@ function handleAgentEvent(data) {
 
     case "error":
       addTraceLogEntry("error", "ERROR", data.content);
-      directOutputBox.innerHTML += `<div style="color: var(--rose-accent); margin-top: 12px;"><strong>Execution Error:</strong> ${escapeHtml(data.content)}</div>`;
+      directOutputBox.innerHTML += `<div style="color: #ef4444; margin-top: 12px;"><strong>Execution Error:</strong> ${escapeHtml(data.content)}</div>`;
       runBtn.disabled = false;
       refreshSessions();
       break;
@@ -769,7 +789,7 @@ document.getElementById("task-form").addEventListener("submit", (e) => {
     ws.send(JSON.stringify({ task, model, session_id: currentSessionId }));
     setTimeout(refreshSessions, 300);
   } else {
-    directOutputBox.innerHTML = '<div style="color: var(--rose-accent);">WebSocket connecting... Retrying task...</div>';
+    directOutputBox.innerHTML = '<div style="color: #ef4444;">WebSocket connecting... Retrying task...</div>';
     runBtn.disabled = false;
   }
 });
@@ -793,8 +813,8 @@ async function loadPrivacyDashboardData() {
     const checksContainer = document.getElementById("privacy-startup-checks");
     if (checksContainer && data.startup_check) {
       checksContainer.innerHTML = data.startup_check.checks.map(c => `
-        <div class="check-item">
-          <span class="check-icon" style="color: ${c.passed ? 'var(--emerald-accent)' : 'var(--rose-accent)'}">${c.passed ? '✓' : '✗'}</span>
+        <div class="check-item flex items-center gap-2">
+          <span class="check-icon font-bold" style="color: ${c.passed ? '#10b981' : '#ef4444'}">${c.passed ? '✓' : '✗'}</span>
           <span>${escapeHtml(c.name)}: ${escapeHtml(c.detail)}</span>
         </div>
       `).join("");
@@ -804,10 +824,10 @@ async function loadPrivacyDashboardData() {
     if (compTable && data.components) {
       compTable.innerHTML = data.components.map(c => `
         <tr>
-          <td><strong>${escapeHtml(c.name)}</strong></td>
-          <td>${escapeHtml(c.type)}</td>
-          <td><code>${escapeHtml(c.location)}</code></td>
-          <td><span class="pill-green">${escapeHtml(c.status)}</span></td>
+          <td class="p-2.5 font-sans font-semibold"><strong>${escapeHtml(c.name)}</strong></td>
+          <td class="p-2.5">${escapeHtml(c.type)}</td>
+          <td class="p-2.5"><code>${escapeHtml(c.location)}</code></td>
+          <td class="p-2.5"><span class="text-emerald-500 font-sans font-bold">${escapeHtml(c.status)}</span></td>
         </tr>
       `).join("");
     }
@@ -818,7 +838,7 @@ async function loadPrivacyDashboardData() {
         netLogs.innerHTML = '<div class="log-entry">No external outbound network requests recorded. Local-Only Mode Active.</div>';
       } else {
         netLogs.innerHTML = data.activity_log.map(l => `
-          <div class="log-entry" style="color: ${l.status === 'BLOCKED' ? 'var(--rose-accent)' : 'var(--emerald-accent)'}">
+          <div class="log-entry" style="color: ${l.status === 'BLOCKED' ? '#ef4444' : '#10b981'}">
             ${l.timestamp} | ${escapeHtml(l.component)} &rarr; ${escapeHtml(l.host)}:${l.port} | ${l.protocol} ${l.direction} | ${l.status}
           </div>
         `).join("");
@@ -862,5 +882,3 @@ window.addEventListener("keydown", (e) => {
     }
   }
 });
-
-

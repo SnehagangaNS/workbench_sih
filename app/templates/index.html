@@ -1,238 +1,302 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Agentic AI Workbench</title>
-<link rel="stylesheet" href="/static/style.css?v=5">
+<!-- Google Fonts: Inter & JetBrains Mono -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+          mono: ['JetBrains Mono', 'monospace'],
+        },
+        colors: {
+          zinc: {
+            50: '#fafafa',
+            100: '#f4f4f5',
+            200: '#e4e4e7',
+            300: '#d4d4d8',
+            400: '#a1a1aa',
+            500: '#71717a',
+            600: '#52525b',
+            700: '#3f3f46',
+            800: '#27272a',
+            900: '#18181b',
+            950: '#09090b',
+          }
+        }
+      }
+    }
+  }
+</script>
+<link rel="stylesheet" href="/static/style.css?v=7">
 </head>
-<body>
+<body class="bg-zinc-50 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 font-sans antialiased h-screen overflow-hidden flex flex-col">
 
-<header class="topbar">
-  <div class="topbar-left">
-    <button type="button" id="toggle-left-sidebar" class="nav-toggle-btn" title="Toggle Sidebar (Left Panel)">
-      <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
-      <span>Sidebar</span>
+<!-- Top Header Navigation -->
+<header class="h-14 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800/80 px-4 flex items-center justify-between z-30 shrink-0">
+  <div class="flex items-center gap-3">
+    <!-- Left Sidebar Toggle Button -->
+    <button type="button" id="toggle-left-sidebar" class="p-2 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors flex items-center gap-2 text-xs font-medium cursor-pointer" title="Toggle Sidebar (Left Panel)">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+      <span class="hidden sm:inline">Sidebar</span>
     </button>
-    <div class="brand-container">
-      <div class="brand-mark">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    
+    <!-- Brand Identity -->
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-emerald-500 flex items-center justify-center text-white shadow-xs">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
       </div>
-      <div class="brand-titles">
-        <span class="brand-name">Agentic AI Workbench</span>
-        <span class="brand-sub">AIR-GAPPED ENTERPRISE RUNTIME</span>
+      <div class="flex flex-col">
+        <span class="font-bold text-sm text-zinc-900 dark:text-zinc-100 leading-tight">Agentic AI Workbench</span>
+        <span class="text-[9px] font-mono tracking-wider text-zinc-400 dark:text-zinc-500 uppercase">Air-Gapped Enterprise Runtime</span>
       </div>
     </div>
   </div>
 
-  <div class="topbar-right">
-    <button type="button" id="open-privacy-dashboard-btn" class="nav-toggle-btn btn-privacy-shield" title="Open Provable Local-Only Privacy & Security Dashboard">
-      <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-      <span>LOCAL-ONLY MODE</span>
+  <!-- Global Status Indicators & Toggles -->
+  <div class="flex items-center gap-2.5">
+    <!-- Local-Only Security Dashboard Button -->
+    <button type="button" id="open-privacy-dashboard-btn" class="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all cursor-pointer" title="Open Provable Local-Only Privacy & Security Dashboard">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+      <span class="hidden md:inline">LOCAL-ONLY MODE</span>
     </button>
-    <button type="button" id="open-pid-viewer-btn" class="nav-toggle-btn btn-pid-viewer" title="Open Interactive Visual P&ID Viewer">
-      <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="10" cy="13" r="2"/><path d="m20 17-1.5-1.5"/></svg>
-      <span>P&ID Viewer</span>
+
+    <!-- Visual P&ID Viewer Button -->
+    <button type="button" id="open-pid-viewer-btn" class="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 transition-all cursor-pointer" title="Open Interactive Visual P&ID Viewer">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="10" cy="13" r="2"/><path d="m20 17-1.5-1.5"/></svg>
+      <span class="hidden sm:inline">P&ID Viewer</span>
     </button>
-    <span class="status-pill" id="ollama-status">
-      <span class="dot" id="ollama-dot"></span>
-      <span id="ollama-status-text">Checking system...</span>
+
+    <!-- Ollama Backend Status Pill -->
+    <span class="status-pill flex items-center gap-2 px-2.5 py-1 text-xs font-mono rounded-full bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700/60" id="ollama-status">
+      <span class="w-2 h-2 rounded-full bg-zinc-400" id="ollama-dot"></span>
+      <span id="ollama-status-text" class="hidden sm:inline">Checking system...</span>
     </span>
-    <span class="status-pill" id="rag-status">
-      <svg class="pill-svg" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+
+    <!-- RAG Chunks Indexed Pill -->
+    <span class="status-pill flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded-full bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700/60" id="rag-status">
+      <svg class="w-3.5 h-3.5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
       <span id="rag-status-text">0 Chunks Indexed</span>
     </span>
-    <button type="button" id="toggle-right-sidebar" class="nav-toggle-btn" title="Upload Files & Open Document Studio (Right Panel)">
-      <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      <span>Upload & Document Studio</span>
+
+    <!-- Dark/Light Theme Toggle Button -->
+    <button type="button" id="theme-toggle-btn" class="p-2 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer" title="Toggle Light/Dark Theme">
+      <svg id="theme-icon-sun" class="w-4 h-4 hidden dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-moon" class="w-4 h-4 block dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+
+    <!-- Document Studio Right Sidebar Toggle -->
+    <button type="button" id="toggle-right-sidebar" class="p-2 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors flex items-center gap-2 text-xs font-medium cursor-pointer" title="Upload Files & Open Document Studio (Right Panel)">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <span class="hidden sm:inline">Document Studio</span>
     </button>
   </div>
 </header>
 
-<main class="layout" id="app-layout">
+<!-- Main App Layout Container (3-Column Fluid Layout) -->
+<main class="layout flex-1 flex overflow-hidden" id="app-layout">
 
-  <!-- LEFT: Chat History & Model Roster (Collapsible) -->
-  <aside class="panel panel-models" id="left-sidebar">
+  <!-- LEFT SIDEBAR: Chat History & Model Roster (Collapsible) -->
+  <aside class="panel panel-models w-64 bg-zinc-100/60 dark:bg-zinc-900/60 border-r border-zinc-200 dark:border-zinc-800/80 flex flex-col h-full transition-all duration-300 ease-in-out shrink-0 overflow-y-auto p-3 gap-4" id="left-sidebar">
+    
+    <!-- New Chat Button -->
     <div class="panel-action-header">
-      <button type="button" id="new-chat-btn" class="btn-new-chat" title="Start New Chat Workspace">
-        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <button type="button" id="new-chat-btn" class="flex items-center justify-center gap-2.5 w-full py-2.5 px-3 rounded-xl border border-zinc-200 dark:border-zinc-700/80 bg-white dark:bg-zinc-800/80 hover:bg-zinc-50 dark:hover:bg-zinc-700/80 text-zinc-900 dark:text-zinc-100 text-sm font-semibold shadow-2xs transition-all cursor-pointer">
+        <svg class="w-4 h-4 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         <span>New Chat</span>
       </button>
     </div>
 
     <!-- Recent Chats Section -->
     <div class="panel-section">
-      <div class="panel-header">
-        <div class="panel-title">Recent Chats</div>
-        <div class="panel-sub">Saved Conversations</div>
+      <div class="px-2 mb-2 flex items-center justify-between">
+        <span class="text-[11px] font-semibold tracking-wider text-zinc-400 dark:text-zinc-500 uppercase">Recent Chats</span>
+        <span class="text-[10px] text-zinc-400 dark:text-zinc-500">History</span>
       </div>
-      <div id="session-list" class="session-list">
-        <div class="trace-empty">No saved chats yet.</div>
+      <div id="session-list" class="session-list flex flex-col gap-1 max-h-56 overflow-y-auto pr-1">
+        <div class="trace-empty text-xs text-zinc-400 italic px-2 py-1">No saved chats yet.</div>
       </div>
     </div>
 
-    <!-- Model Roster Section -->
-    <div class="panel-section">
-      <div class="panel-header">
-        <div class="panel-title">Model Roster</div>
-        <div class="panel-sub">Registry & Discovery</div>
+    <!-- Model Roster Section (Redesigned Compact List) -->
+    <div class="panel-section mt-auto">
+      <div class="px-2 mb-2 flex items-center justify-between">
+        <span class="text-[11px] font-semibold tracking-wider text-zinc-400 dark:text-zinc-500 uppercase">Model Roster</span>
+        <span class="text-[10px] text-zinc-400 dark:text-zinc-500">Registry</span>
       </div>
-      <div id="model-list" class="model-list">
-        <div class="model-row skeleton">Scanning active models...</div>
+      <div id="model-list" class="model-list flex flex-col gap-1.5 max-h-64 overflow-y-auto pr-1">
+        <div class="model-row skeleton text-xs text-zinc-400 italic px-2 py-1">Scanning active models...</div>
       </div>
     </div>
   </aside>
 
-  <!-- CENTER: Main Task & Direct Answer Workspace -->
-  <section class="panel panel-main" id="main-workspace">
-    
-    <!-- Task Form -->
-    <form id="task-form" class="task-form">
-      <div class="control-bar">
-        <div class="model-select-group">
-          <label for="model-select" class="field-label">Target Model:</label>
-          <select id="model-select" class="model-select-dropdown">
-            <option value="auto">Auto-detect (Smart Task Router)</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Quick Prompt Action Chips -->
-      <div class="prompt-chips">
-        <span class="chip-label">Prompts:</span>
-        <button type="button" class="chip" data-prompt="What equipment and valves are downstream of P-101 in the P&ID drawing?">P&ID: Downstream Query</button>
-        <button type="button" class="chip" data-prompt="Trace the connected piping path from TK-101 to P-102 in the P&ID diagram.">P&ID: Trace Pipeline Path</button>
-        <button type="button" class="chip" data-prompt="Read and summarize the key facts, specs, and action items from the document in uploads.">Summarize Document</button>
-        <button type="button" class="chip" data-prompt="Analyze the uploaded spreadsheet. Calculate totals, averages, and group summaries using Python pandas.">Analyze Data</button>
-      </div>
-
-      <div class="input-wrapper">
-        <textarea id="task-input" placeholder="Enter task instructions or P&ID engineering questions (e.g. 'What is downstream of P-101?')..." rows="3"></textarea>
-      </div>
+  <!-- CENTER WORKSPACE: Main Task & Direct Answer Workspace -->
+  <section class="panel panel-main flex-1 flex flex-col h-full overflow-y-auto bg-zinc-50 dark:bg-zinc-950 px-4 md:px-8 py-6 gap-6 min-w-0" id="main-workspace">
+    <div class="max-w-4xl mx-auto w-full flex flex-col gap-6 flex-1">
       
-      <div class="form-actions">
-        <button type="submit" id="run-btn" class="btn-primary">
-          <svg class="btn-svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          <span>Run Task</span>
-        </button>
-        <button type="button" id="clear-btn" class="btn-secondary">Clear Workspace</button>
-      </div>
-    </form>
+      <!-- Task Form -->
+      <form id="task-form" class="task-form bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 md:p-5 shadow-2xs flex flex-col gap-3.5">
+        
+        <!-- Top Bar: Target Model Dropdown Inline -->
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <label for="model-select" class="text-xs font-semibold text-zinc-500 dark:text-zinc-400 whitespace-nowrap">Target Model:</label>
+            <select id="model-select" class="bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/80 rounded-lg text-xs py-1.5 px-3 font-medium text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-indigo-500 cursor-pointer">
+              <option value="auto">Auto-detect (Smart Task Router)</option>
+            </select>
+          </div>
+        </div>
 
-    <!-- Main Direct Output Display Workspace -->
-    <div class="output-workspace-card">
-      <div class="output-header">
-        <div class="output-header-title">
-          <span>Direct Output & Analysis</span>
+        <!-- Quick Prompt Action Chips -->
+        <div class="prompt-chips flex flex-wrap items-center gap-2 pt-1">
+          <span class="text-[11px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mr-1">Prompts:</span>
+          <button type="button" class="chip px-3 py-1.5 rounded-full text-xs font-medium bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/70 cursor-pointer transition-all shadow-2xs" data-prompt="What equipment and valves are downstream of P-101 in the P&ID drawing?">P&ID: Downstream Query</button>
+          <button type="button" class="chip px-3 py-1.5 rounded-full text-xs font-medium bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/70 cursor-pointer transition-all shadow-2xs" data-prompt="Trace the connected piping path from TK-101 to P-102 in the P&ID diagram.">P&ID: Trace Pipeline Path</button>
+          <button type="button" class="chip px-3 py-1.5 rounded-full text-xs font-medium bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/70 cursor-pointer transition-all shadow-2xs" data-prompt="Read and summarize the key facts, specs, and action items from the document in uploads.">Summarize Document</button>
+          <button type="button" class="chip px-3 py-1.5 rounded-full text-xs font-medium bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/70 cursor-pointer transition-all shadow-2xs" data-prompt="Analyze the uploaded spreadsheet. Calculate totals, averages, and group summaries using Python pandas.">Analyze Data</button>
         </div>
-        <div id="export-container" class="export-container" style="display: none;">
-          <button id="export-docx-btn" class="btn-export">
-            <svg class="btn-svg" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            <span>Export Word (.docx)</span>
+
+        <!-- Task Input Textarea -->
+        <div class="input-wrapper">
+          <textarea id="task-input" placeholder="Enter task instructions or P&ID engineering questions (e.g. 'What is downstream of P-101?')..." rows="3" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all resize-y min-h-[80px]"></textarea>
+        </div>
+        
+        <!-- Form Action Buttons -->
+        <div class="form-actions flex items-center gap-3 pt-1">
+          <button type="submit" id="run-btn" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs rounded-xl shadow-2xs transition-all flex items-center gap-2 cursor-pointer border-0">
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>Run Task</span>
           </button>
-          <button id="export-md-btn" class="btn-export-sub">
-            <svg class="btn-svg" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            <span>Export Markdown (.md)</span>
-          </button>
+          <button type="button" id="clear-btn" class="px-4 py-2.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium text-xs rounded-xl transition-all cursor-pointer bg-transparent border-0">Clear Workspace</button>
+        </div>
+      </form>
+
+      <!-- Output Display Workspace (No Heavy Box, let text breathe) -->
+      <div class="output-workspace-card flex-1 flex flex-col min-h-[300px]">
+        <div class="flex items-center justify-between px-2 py-1.5 mb-2">
+          <div class="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+            Direct Output & Analysis
+          </div>
+          <!-- Top Right Export Buttons -->
+          <div id="export-container" class="export-container flex items-center gap-2" style="display: none;">
+            <button id="export-docx-btn" class="px-2.5 py-1 text-xs font-medium rounded-lg bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 transition-all flex items-center gap-1.5 cursor-pointer">
+              <svg class="w-3.5 h-3.5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span>Export Word</span>
+            </button>
+            <button id="export-md-btn" class="px-2.5 py-1 text-xs font-medium rounded-lg bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 transition-all flex items-center gap-1.5 cursor-pointer">
+              <svg class="w-3.5 h-3.5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span>Export Markdown</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Direct Output Text Container (Clean, Breathable) -->
+        <div id="direct-output-box" class="direct-output-box flex-1 p-5 rounded-2xl bg-white dark:bg-zinc-900/70 border border-zinc-200 dark:border-zinc-800/80 text-sm leading-relaxed text-zinc-800 dark:text-zinc-200 overflow-y-auto shadow-2xs">
+          <div class="output-placeholder text-zinc-400 dark:text-zinc-500 italic text-xs text-center py-16">
+            Submit a task or select a prompt above. The direct answer will stream below cleanly in real-time.
+          </div>
         </div>
       </div>
-      
-      <!-- Direct Output Content Box -->
-      <div id="direct-output-box" class="direct-output-box">
-        <div class="output-placeholder">
-          Submit a task or select a prompt above. The direct answer will stream below cleanly in real-time.
+
+      <!-- Collapsible Technical Execution Logs Accordion Drawer -->
+      <details id="execution-steps-drawer" class="execution-drawer group border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900/60 overflow-hidden shadow-2xs mt-auto">
+        <summary class="drawer-summary flex items-center justify-between px-4 py-2.5 cursor-pointer select-none bg-zinc-50 dark:bg-zinc-900/90 hover:bg-zinc-100 dark:hover:bg-zinc-800/90 transition-colors">
+          <div class="flex items-center gap-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400">
+            <svg class="w-4 h-4 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Technical Execution Logs</span>
+          </div>
+          <span class="drawer-badge text-[10px] font-mono bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-2 py-0.5 rounded-full" id="step-count-badge">0 Steps</span>
+        </summary>
+        <div id="trace-logs" class="trace-logs p-3 font-mono text-xs max-h-48 overflow-y-auto border-t border-zinc-200 dark:border-zinc-800 bg-zinc-950 text-zinc-300">
+          <div class="trace-empty text-zinc-500 italic">Technical execution step logs will record here.</div>
         </div>
-      </div>
+      </details>
+
     </div>
-
-    <!-- Collapsible Technical Execution Steps Drawer (Hidden by default) -->
-    <details id="execution-steps-drawer" class="execution-drawer">
-      <summary class="drawer-summary">
-        <div class="drawer-title-group">
-          <svg class="drawer-icon" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <span class="drawer-title">Technical Execution Logs</span>
-        </div>
-        <span class="drawer-badge" id="step-count-badge">0 Steps</span>
-      </summary>
-      <div id="trace-logs" class="trace-logs">
-        <div class="trace-empty">Technical execution step logs will record here.</div>
-      </div>
-    </details>
-
   </section>
 
-  <!-- RIGHT: Ingestion & Deliverables Studio (Collapsible) -->
-  <aside class="panel panel-side" id="right-sidebar">
+  <!-- RIGHT SIDEBAR: Document Studio (Collapsible) -->
+  <aside class="panel panel-side w-80 bg-zinc-100/40 dark:bg-zinc-900/40 border-l border-zinc-200 dark:border-zinc-800/80 flex flex-col h-full transition-all duration-300 ease-in-out shrink-0 overflow-y-auto p-4 gap-4" id="right-sidebar">
     <div class="panel-header">
-      <div class="panel-title">Document Studio</div>
-      <div class="panel-sub">P&ID PDF / DOCX / PPTX / XLSX / Images</div>
+      <div class="font-bold text-sm text-zinc-900 dark:text-zinc-100">Document Studio</div>
+      <div class="text-xs text-zinc-400 dark:text-zinc-500">P&ID PDF / DOCX / PPTX / XLSX / Images</div>
     </div>
     
-    <form id="upload-form" class="upload-form">
-      <div id="drop-zone" class="drop-zone">
-        <svg class="drop-svg" viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <div class="drop-text">Drag & drop files here</div>
-        <div class="drop-sub">or <span class="browse-link">browse system files</span></div>
-        <input type="file" id="file-input" class="file-input-hidden" />
+    <form id="upload-form" class="upload-form flex flex-col gap-3">
+      <div id="drop-zone" class="drop-zone border-2 border-dashed border-zinc-300 dark:border-zinc-700/80 hover:border-indigo-500 dark:hover:border-indigo-500 bg-white/60 dark:bg-zinc-800/40 rounded-xl p-5 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2 group shadow-2xs">
+        <svg class="w-7 h-7 text-zinc-400 group-hover:text-indigo-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <div class="drop-text text-xs font-semibold text-zinc-800 dark:text-zinc-200">Drag & drop files here</div>
+        <div class="drop-sub text-[11px] text-zinc-400">or <span class="browse-link text-indigo-500 underline">browse system files</span></div>
+        <input type="file" id="file-input" class="file-input-hidden hidden" />
       </div>
 
-      <div class="ingest-controls">
-        <select id="mode-select" class="mode-select">
+      <div class="ingest-controls flex flex-col gap-2">
+        <select id="mode-select" class="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/80 rounded-lg text-xs py-2 px-3 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-indigo-500 cursor-pointer">
           <option value="">Auto-detect Extraction Mode</option>
           <option value="pid">P&ID Diagram Intelligence Pipeline</option>
           <option value="handwriting">Handwriting Transcription</option>
           <option value="engineering_drawing">Engineering Drawing / Schematic</option>
         </select>
-        <button type="submit" class="btn-ingest">Ingest File</button>
+        <button type="submit" class="btn-ingest w-full py-2 px-4 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-semibold rounded-lg shadow-2xs transition-all cursor-pointer border-0">Ingest File</button>
       </div>
     </form>
     
-    <div id="ingest-log" class="ingest-log"></div>
+    <div id="ingest-log" class="ingest-log flex flex-col gap-1 text-[11px] font-mono text-zinc-600 dark:text-zinc-400 max-h-28 overflow-y-auto"></div>
 
-    <div class="panel-header outputs-header">
-      <div class="panel-title">Session Deliverables</div>
+    <div class="panel-header mt-2">
+      <div class="font-bold text-sm text-zinc-900 dark:text-zinc-100">Session Deliverables</div>
     </div>
-    <div id="output-list" class="output-list">
-      <div class="trace-empty">Current session deliverables will appear here.</div>
+    <div id="output-list" class="output-list flex flex-col gap-2">
+      <div class="trace-empty text-xs text-zinc-400 italic">Current session deliverables will appear here.</div>
     </div>
   </aside>
 
 </main>
 
 <!-- Interactive Visual P&ID Viewer Modal Overlay -->
-<div id="pid-modal" class="pid-modal-backdrop" style="display: none;">
-  <div class="pid-modal-content">
-    <div class="pid-modal-header">
-      <div class="pid-modal-title-group">
-        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+<div id="pid-modal" class="pid-modal-backdrop fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-md flex items-center justify-center p-4" style="display: none;">
+  <div class="pid-modal-content w-[92vw] h-[90vh] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+    <div class="pid-modal-header px-5 py-3.5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50 dark:bg-zinc-900">
+      <div class="pid-modal-title-group flex items-center gap-2 text-zinc-900 dark:text-zinc-100 font-bold text-sm">
+        <svg class="w-4 h-4 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
         <span class="pid-modal-title">Interactive Visual P&ID Viewer</span>
       </div>
       
-      <div class="pid-modal-controls">
-        <select id="pid-doc-select" class="pid-select-dropdown">
+      <div class="pid-modal-controls flex items-center gap-3">
+        <select id="pid-doc-select" class="pid-select-dropdown bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs py-1 px-3 rounded-lg text-zinc-800 dark:text-zinc-200 outline-none">
           <option value="">Select P&ID Drawing...</option>
         </select>
 
-        <div class="zoom-controls">
-          <button type="button" id="pid-zoom-in-btn" class="btn-zoom" title="Zoom In">+</button>
-          <button type="button" id="pid-zoom-out-btn" class="btn-zoom" title="Zoom Out">-</button>
-          <button type="button" id="pid-zoom-reset-btn" class="btn-zoom" title="Reset Zoom">100%</button>
+        <div class="zoom-controls flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
+          <button type="button" id="pid-zoom-in-btn" class="px-2 py-0.5 text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded cursor-pointer" title="Zoom In">+</button>
+          <button type="button" id="pid-zoom-out-btn" class="px-2 py-0.5 text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded cursor-pointer" title="Zoom Out">-</button>
+          <button type="button" id="pid-zoom-reset-btn" class="px-2 py-0.5 text-[10px] font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded cursor-pointer" title="Reset Zoom">100%</button>
         </div>
 
-        <div class="overlay-toggles">
-          <label class="toggle-label"><input type="checkbox" id="toggle-symbols-cb" checked> Symbols</label>
-          <label class="toggle-label"><input type="checkbox" id="toggle-texts-cb" checked> OCR Tags</label>
+        <div class="overlay-toggles flex items-center gap-3 text-xs text-zinc-600 dark:text-zinc-400">
+          <label class="toggle-label flex items-center gap-1 cursor-pointer"><input type="checkbox" id="toggle-symbols-cb" checked class="rounded text-indigo-600"> Symbols</label>
+          <label class="toggle-label flex items-center gap-1 cursor-pointer"><input type="checkbox" id="toggle-texts-cb" checked class="rounded text-indigo-600"> OCR Tags</label>
         </div>
 
-        <button type="button" id="close-pid-modal-btn" class="btn-close-modal" title="Close Viewer">
-          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <button type="button" id="close-pid-modal-btn" class="p-1.5 text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-100 rounded-lg cursor-pointer" title="Close Viewer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
     </div>
 
-    <div class="pid-modal-body">
-      <div id="pid-canvas-container" class="pid-canvas-container">
-        <div class="pid-viewer-placeholder">
+    <div class="pid-modal-body flex-1 overflow-auto p-4 bg-zinc-950 flex justify-center items-start">
+      <div id="pid-canvas-container" class="pid-canvas-container relative transition-transform duration-200 origin-top">
+        <div class="pid-viewer-placeholder text-zinc-500 italic text-xs p-12 text-center">
           Select a processed P&ID document above to launch interactive bounding boxes and path highlights.
         </div>
       </div>
@@ -241,72 +305,74 @@
 </div>
 
 <!-- Privacy & Security Dashboard Modal -->
-<div id="privacy-dashboard-modal" class="pid-modal-backdrop hidden">
-  <div class="pid-modal-content privacy-modal-content">
-    <div class="pid-modal-header">
-      <div class="pid-modal-title-group">
-        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+<div id="privacy-dashboard-modal" class="pid-modal-backdrop fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+  <div class="pid-modal-content privacy-modal-content w-[85vw] max-w-4xl max-h-[85vh] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+    <div class="pid-modal-header px-5 py-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50 dark:bg-zinc-900">
+      <div class="pid-modal-title-group flex items-center gap-2.5 text-zinc-900 dark:text-zinc-100 font-bold text-sm">
+        <svg class="w-5 h-5 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
         <span class="pid-modal-title">Provable Local-Only Privacy & Security Dashboard</span>
       </div>
-      <button type="button" id="close-privacy-modal-btn" class="btn-close-modal">
-        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <button type="button" id="close-privacy-modal-btn" class="p-1.5 text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-100 rounded-lg cursor-pointer">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
 
-    <div class="privacy-modal-body">
+    <div class="privacy-modal-body p-6 overflow-y-auto flex flex-col gap-6 text-xs text-zinc-700 dark:text-zinc-300">
       <!-- Status Cards Grid -->
-      <div class="privacy-grid">
-        <div class="privacy-card">
-          <div class="card-label">Security Mode</div>
-          <div class="card-value mode-badge">LOCAL-ONLY MODE</div>
+      <div class="privacy-grid grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="privacy-card p-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60 flex flex-col gap-1">
+          <div class="text-[10px] uppercase font-semibold text-zinc-400">Security Mode</div>
+          <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400">LOCAL-ONLY MODE</div>
         </div>
-        <div class="privacy-card">
-          <div class="card-label">External Network Calls</div>
-          <div class="card-value zero-badge">0</div>
+        <div class="privacy-card p-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60 flex flex-col gap-1">
+          <div class="text-[10px] uppercase font-semibold text-zinc-400">External Network Calls</div>
+          <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100">0</div>
         </div>
-        <div class="privacy-card">
-          <div class="card-label">Blocked External Attempts</div>
-          <div class="card-value zero-badge" id="privacy-blocked-count">0</div>
+        <div class="privacy-card p-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60 flex flex-col gap-1">
+          <div class="text-[10px] uppercase font-semibold text-zinc-400">Blocked External Attempts</div>
+          <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100" id="privacy-blocked-count">0</div>
         </div>
-        <div class="privacy-card">
-          <div class="card-label">Network Monitor Status</div>
-          <div class="card-value active-badge">ACTIVE (Patched)</div>
+        <div class="privacy-card p-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60 flex flex-col gap-1">
+          <div class="text-[10px] uppercase font-semibold text-zinc-400">Network Monitor Status</div>
+          <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400">ACTIVE (Patched)</div>
         </div>
       </div>
 
       <!-- Startup Verification Status -->
-      <div class="privacy-section">
-        <div class="privacy-section-title">Local-Only Security Startup Audit</div>
-        <div id="privacy-startup-checks" class="startup-checks-list">
-          <div class="check-item"><span class="check-icon">✓</span> LLM Driver: localhost:11434 (Ollama)</div>
-          <div class="check-item"><span class="check-icon">✓</span> OCR Extractor: On-Device (Tesseract)</div>
-          <div class="check-item"><span class="check-icon">✓</span> Embeddings: nomic-embed-text (Local)</div>
-          <div class="check-item"><span class="check-icon">✓</span> Vector Database: ChromaDB Persistent</div>
+      <div class="privacy-section flex flex-col gap-2">
+        <div class="font-bold text-xs text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Local-Only Security Startup Audit</div>
+        <div id="privacy-startup-checks" class="startup-checks-list grid grid-cols-1 md:grid-cols-2 gap-2 bg-zinc-50 dark:bg-zinc-950 p-3 rounded-xl border border-zinc-200 dark:border-zinc-800">
+          <div class="check-item flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> LLM Driver: localhost:11434 (Ollama)</div>
+          <div class="check-item flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> OCR Extractor: On-Device (Tesseract)</div>
+          <div class="check-item flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Embeddings: nomic-embed-text (Local)</div>
+          <div class="check-item flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Vector Database: ChromaDB Persistent</div>
         </div>
       </div>
 
       <!-- Component Registry Table -->
-      <div class="privacy-section">
-        <div class="privacy-section-title">Local Service Component Registry</div>
-        <table class="privacy-table">
-          <thead>
-            <tr>
-              <th>Component</th>
-              <th>Type</th>
-              <th>Location</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="privacy-component-rows">
-            <tr><td>Local LLM</td><td>Inference Engine</td><td>localhost:11434</td><td><span class="pill-green">LOCAL-ONLY</span></td></tr>
-          </tbody>
-        </table>
+      <div class="privacy-section flex flex-col gap-2">
+        <div class="font-bold text-xs text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Local Service Component Registry</div>
+        <div class="overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800">
+          <table class="privacy-table w-full text-left border-collapse">
+            <thead class="bg-zinc-100 dark:bg-zinc-800/80 text-[10px] uppercase text-zinc-400">
+              <tr>
+                <th class="p-2.5">Component</th>
+                <th class="p-2.5">Type</th>
+                <th class="p-2.5">Location</th>
+                <th class="p-2.5">Status</th>
+              </tr>
+            </thead>
+            <tbody id="privacy-component-rows" class="divide-y divide-zinc-200 dark:divide-zinc-800 font-mono text-[11px]">
+              <tr><td class="p-2.5 font-sans font-semibold">Local LLM</td><td class="p-2.5">Inference Engine</td><td class="p-2.5">localhost:11434</td><td class="p-2.5"><span class="text-emerald-500 font-sans font-bold">LOCAL-ONLY</span></td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- Observable Network Monitor Live Stream -->
-      <div class="privacy-section">
-        <div class="privacy-section-title">Observable Network Activity Monitor Log</div>
-        <div class="privacy-log-container" id="privacy-network-logs">
+      <div class="privacy-section flex flex-col gap-2">
+        <div class="font-bold text-xs text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Observable Network Activity Monitor Log</div>
+        <div class="privacy-log-container p-3 rounded-xl bg-zinc-950 border border-zinc-800 font-mono text-[11px] max-h-36 overflow-y-auto text-zinc-400" id="privacy-network-logs">
           <div class="log-entry">12:41:02 | Local LLM (Ollama) -> 127.0.0.1:11434 | TCP/IP OUTBOUND | ALLOWED</div>
         </div>
       </div>
@@ -314,6 +380,6 @@
   </div>
 </div>
 
-<script src="/static/app.js?v=6"></script>
+<script src="/static/app.js?v=7"></script>
 </body>
 </html>
