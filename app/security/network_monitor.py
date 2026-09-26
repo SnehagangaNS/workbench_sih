@@ -140,6 +140,7 @@ class LocalNetworkMonitor:
                 "local_services_count": 9,
                 "total_recorded_events": len(self.monitored_calls),
                 "external_network_calls": 0,
+                "external_attempts": self.external_attempts,
                 "blocked_external_attempts": self.blocked_attempts,
             }
 

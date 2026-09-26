@@ -21,6 +21,7 @@ FastAPI app tying everything together:
 Run with:  uvicorn app.main:app --reload --port 8000
 """
 
+import asyncio
 import json
 import shutil
 import time
@@ -51,6 +52,7 @@ UPLOAD_DIR = BASE_DIR / "data" / "uploads"
 OUTPUT_DIR = BASE_DIR / "data" / "outputs"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+active_agent_tasks: dict[str, asyncio.Task] = {}
 
 app = FastAPI(title="Local AI Workbench")
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "app" / "static")), name="static")
@@ -77,6 +79,7 @@ def _tag_matches(registered_name: str, local_models: list[str]) -> bool:
 async def status():
     healthy = await ollama.health()
     local_models = await ollama.list_local_models() if healthy else []
+    embedding_available = any(_tag_matches("nomic-embed-text:latest", [model]) for model in local_models)
     
     registered = []
     for m in router.models:
@@ -106,6 +109,10 @@ async def status():
         "ollama_running": healthy,
         "registered_models": registered,
         "rag_stats": collection_stats(),
+        "runtime": {
+            "ollama_state": "available" if healthy else "missing",
+            "embedding_state": "available" if embedding_available else "missing",
+        },
     }
 
 
@@ -141,6 +148,15 @@ async def upload(file: UploadFile):
             shutil.copyfileobj(file.file, f)
 
     return {"saved_to": f"uploads/{dest.name}", "filename": dest.name}
+
+
+@app.get("/api/uploads")
+async def list_uploads():
+    files = sorted((f for f in UPLOAD_DIR.iterdir() if f.is_file() and not f.name.startswith(".")), key=lambda f: f.stat().st_mtime, reverse=True)
+    return [
+        {"filename": f.name, "extension": f.suffix.lower().lstrip("."), "size_kb": round(f.stat().st_size / 1024, 1)}
+        for f in files
+    ]
 
 
 @app.post("/api/ingest")
@@ -322,6 +338,45 @@ async def download_output(filename: str):
     return FileResponse(str(path), filename=filename)
 
 
+async def _run_agent_task(websocket: WebSocket, task: str, selected_model: str, session_id: str):
+    accumulated_output = []
+    trace_logs = []
+    deliverables = []
+    save_session(session_id, {"task": task, "model": selected_model, "output": "Processing task...", "trace_logs": [], "deliverables": []})
+    try:
+        async for event in run_agent(task, selected_model=selected_model):
+            await websocket.send_json({**event, "session_id": session_id})
+            event_type = event.get("type")
+            if event_type == "stream_chunk" and event.get("chunk"):
+                accumulated_output.append(event["chunk"])
+            elif event_type in ("routing", "thinking", "tool_call", "tool_result"):
+                trace_logs.append(event)
+                args = event.get("args", {})
+                if event_type == "tool_call" and isinstance(args, dict) and args.get("filename"):
+                    deliverables.append(args["filename"])
+            elif event_type in ("final", "error"):
+                save_session(session_id, {"task": task, "model": selected_model, "output": "".join(accumulated_output) or event.get("content", ""), "trace_logs": trace_logs, "deliverables": deliverables})
+    except asyncio.CancelledError:
+        message = "Task stopped by the user."
+        save_session(session_id, {"task": task, "model": selected_model, "output": "".join(accumulated_output) or message, "trace_logs": trace_logs, "deliverables": deliverables})
+        try:
+            await websocket.send_json({"type": "cancelled", "content": message, "session_id": session_id})
+        except Exception:
+            pass
+        raise
+    finally:
+        active_agent_tasks.pop(session_id, None)
+
+
+@app.post("/api/tasks/{session_id}/cancel")
+async def cancel_task(session_id: str):
+    task = active_agent_tasks.get(session_id)
+    if not task or task.done():
+        return {"cancelled": False, "message": "No active task found."}
+    task.cancel()
+    return {"cancelled": True, "message": "Cancellation requested."}
+
+
 @app.websocket("/ws/agent")
 async def agent_ws(websocket: WebSocket):
     await websocket.accept()
@@ -333,47 +388,15 @@ async def agent_ws(websocket: WebSocket):
             session_id = data.get("session_id") or f"session_{int(time.time()*1000)}"
             if not task:
                 continue
-
-            accumulated_output = []
-            trace_logs = []
-            deliverables = []
-
-            # Save initial session state on start
-            save_session(session_id, {
-                "task": task,
-                "model": selected_model,
-                "output": "Processing task...",
-                "trace_logs": [],
-                "deliverables": [],
-            })
-
-            async for event in run_agent(task, selected_model=selected_model):
-                await websocket.send_json({**event, "session_id": session_id})
-                
-                event_type = event.get("type")
-                if event_type == "stream_chunk":
-                    chunk_text = event.get("chunk", "")
-                    if chunk_text:
-                        accumulated_output.append(chunk_text)
-                elif event_type in ("routing", "thinking", "tool_call", "tool_result"):
-                    trace_logs.append(event)
-                    if event_type == "tool_call":
-                        args = event.get("args", {})
-                        if isinstance(args, dict) and args.get("filename"):
-                            deliverables.append(args["filename"])
-
-                elif event_type in ("final", "error"):
-                    final_output = "".join(accumulated_output) or event.get("content", "")
-                    save_session(session_id, {
-                        "task": task,
-                        "model": selected_model,
-                        "output": final_output,
-                        "trace_logs": trace_logs,
-                        "deliverables": deliverables,
-                    })
-
+            workflow = asyncio.create_task(_run_agent_task(websocket, task, selected_model, session_id))
+            active_agent_tasks[session_id] = workflow
+            try:
+                await workflow
+            except asyncio.CancelledError:
+                continue
     except WebSocketDisconnect:
-        pass
+        for task in list(active_agent_tasks.values()):
+            task.cancel()
 
 
 # ---------------- Security & Privacy REST Endpoints ----------------
@@ -381,8 +404,21 @@ async def agent_ws(websocket: WebSocket):
 @app.get("/api/security/privacy-dashboard")
 async def get_privacy_dashboard():
     stats = network_monitor.get_summary_stats()
-    startup = startup_checker.run_check()
-    components = component_registry.list_components()
+    ollama_available = await ollama.health()
+    local_models = await ollama.list_local_models() if ollama_available else []
+    embedding_available = any(_tag_matches("nomic-embed-text:latest", [model]) for model in local_models)
+    startup = startup_checker.run_check({
+        "ollama_state": "available" if ollama_available else "missing",
+        "embedding_state": "available" if embedding_available else "missing",
+    })
+    components = component_registry.list_components({
+        "ollama_llm": "AVAILABLE" if ollama_available else "MISSING",
+        "ollama_embed": "AVAILABLE" if embedding_available else "MISSING",
+        "tesseract_ocr": "AVAILABLE" if startup["ocr_local"] else "MISSING",
+        "chromadb_local": "VERIFIED" if startup["vector_store_local"] else "CONFIGURED",
+        "fastapi_frontend": "AVAILABLE",
+        "fastapi_backend": "AVAILABLE",
+    })
     activity = network_monitor.get_activity_log(limit=15)
     return {
         "privacy_status": "LOCAL-ONLY",

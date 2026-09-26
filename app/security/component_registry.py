@@ -16,7 +16,7 @@ class ComponentRegistry:
                 "component_id": "ollama_llm",
                 "type": "Inference Engine",
                 "location": "localhost:11434",
-                "status": "LOCAL-ONLY",
+                "status": "CONFIGURED",
                 "details": "Ollama local server (Qwen 2.5 3B/7B, Llama 3.2)",
             },
             {
@@ -24,7 +24,7 @@ class ComponentRegistry:
                 "component_id": "ollama_embed",
                 "type": "Embedding Generator",
                 "location": "localhost:11434",
-                "status": "LOCAL-ONLY",
+                "status": "CONFIGURED",
                 "details": "Ollama local nomic-embed-text model",
             },
             {
@@ -32,7 +32,7 @@ class ComponentRegistry:
                 "component_id": "tesseract_ocr",
                 "type": "Text Extraction",
                 "location": "local process",
-                "status": "LOCAL-ONLY",
+                "status": "CONFIGURED",
                 "details": "Pytesseract / OpenCV on-device OCR",
             },
             {
@@ -40,7 +40,7 @@ class ComponentRegistry:
                 "component_id": "yolo_sahi",
                 "type": "Visual Object Detector",
                 "location": "local process",
-                "status": "LOCAL-ONLY",
+                "status": "CONFIGURED",
                 "details": "OpenCV geometric contour & local YOLO inference",
             },
             {
@@ -48,7 +48,7 @@ class ComponentRegistry:
                 "component_id": "networkx_pid",
                 "type": "Graph Engine",
                 "location": "local process",
-                "status": "LOCAL-ONLY",
+                "status": "CONFIGURED",
                 "details": "NetworkX directed engineering graph",
             },
             {
@@ -56,7 +56,7 @@ class ComponentRegistry:
                 "component_id": "chromadb_local",
                 "type": "Vector Database",
                 "location": "localhost (data/vectorstore)",
-                "status": "LOCAL-ONLY",
+                "status": "CONFIGURED",
                 "details": "ChromaDB local persistent client",
             },
             {
@@ -64,7 +64,7 @@ class ComponentRegistry:
                 "component_id": "local_knowledge_connector",
                 "type": "Knowledge Index",
                 "location": "local/on-premise (data/knowledge)",
-                "status": "LOCAL-ONLY",
+                "status": "CONFIGURED",
                 "details": "Local file shares, manuals, SOPs, past correspondence",
             },
             {
@@ -72,7 +72,7 @@ class ComponentRegistry:
                 "component_id": "fastapi_frontend",
                 "type": "User Interface",
                 "location": "localhost:8000",
-                "status": "LOCAL-ONLY",
+                "status": "CONFIGURED",
                 "details": "FastAPI static template server",
             },
             {
@@ -80,13 +80,17 @@ class ComponentRegistry:
                 "component_id": "fastapi_backend",
                 "type": "REST & WS API Server",
                 "location": "localhost:8000",
-                "status": "LOCAL-ONLY",
+                "status": "CONFIGURED",
                 "details": "FastAPI local app server",
             },
         ]
 
-    def list_components(self) -> List[Dict[str, str]]:
-        return self.components
+    def list_components(self, runtime_states: Dict[str, str] | None = None) -> List[Dict[str, str]]:
+        runtime_states = runtime_states or {}
+        return [
+            {**component, "status": runtime_states.get(component["component_id"], component["status"])}
+            for component in self.components
+        ]
 
 
 component_registry = ComponentRegistry()
