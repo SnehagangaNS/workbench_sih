@@ -7,6 +7,7 @@ run strictly on local endpoints without active cloud API keys or runtime externa
 """
 
 import os
+import shutil
 from typing import Any, Dict
 from app.security.audit_log import audit_logger
 from app.security.network_monitor import network_monitor
@@ -16,13 +17,18 @@ class LocalStartupCheck:
     def __init__(self):
         pass
 
-    def run_check(self) -> Dict[str, Any]:
+    def run_check(self, runtime: Dict[str, Any] | None = None) -> Dict[str, Any]:
+        runtime = runtime or {}
+        ollama_state = runtime.get("ollama_state", "configured")
+        embedding_state = runtime.get("embedding_state", "configured")
+        tesseract_available = bool(shutil.which("tesseract"))
+        vector_store_ready = os.path.isdir("data/vectorstore")
         results = {
             "mode": "LOCAL-ONLY",
-            "llm_local": True,
-            "ocr_local": True,
-            "embeddings_local": True,
-            "vector_store_local": True,
+            "llm_local": ollama_state in {"available", "verified"},
+            "ocr_local": tesseract_available,
+            "embeddings_local": embedding_state in {"available", "verified"},
+            "vector_store_local": vector_store_ready,
             "knowledge_base_local": True,
             "pid_graph_local": True,
             "external_api_keys_unused": True,
@@ -32,23 +38,24 @@ class LocalStartupCheck:
         }
 
         checks = [
-            ("LLM Driver Endpoint", "http://127.0.0.1:11434 (Ollama)", True),
-            ("OCR Text Extractor", "Pytesseract / OpenCV (On-Device)", True),
-            ("Vector Embeddings Model", "Ollama nomic-embed-text (Local)", True),
-            ("Vector Database", "ChromaDB Persistent (data/vectorstore)", True),
-            ("Organizational Knowledge Base", "Local Connector (data/knowledge)", True),
-            ("P&ID Knowledge Graph", "NetworkX Directed Graph (Local)", True),
-            ("External API Keys Check", "Zero Cloud Keys Configured", self._verify_no_cloud_keys()),
-            ("Observable Network Monitor", "LocalNetworkMonitor Active", network_monitor.is_active),
+            ("LLM driver", "Ollama at 127.0.0.1:11434", ollama_state, ollama_state in {"available", "verified"}),
+            ("OCR engine", "Tesseract executable on this computer", "available" if tesseract_available else "missing", tesseract_available),
+            ("Embedding model", "nomic-embed-text in Ollama", embedding_state, embedding_state in {"available", "verified"}),
+            ("Vector database", "ChromaDB local folder", "verified" if vector_store_ready else "configured", vector_store_ready),
+            ("Knowledge base", "Local data/knowledge folder", "configured", True),
+            ("P&ID graph", "NetworkX local process", "configured", True),
+            ("Cloud API keys", "No configured cloud API keys", "verified" if self._verify_no_cloud_keys() else "attention", self._verify_no_cloud_keys()),
+            ("Socket monitor", "Application-level outbound socket monitor", "available" if network_monitor.is_active else "missing", network_monitor.is_active),
         ]
 
         formatted_checks = []
         all_passed = True
 
-        for name, detail, passed in checks:
+        for name, detail, state, passed in checks:
             formatted_checks.append({
                 "name": name,
                 "detail": detail,
+                "state": state,
                 "passed": passed,
             })
             if not passed:
